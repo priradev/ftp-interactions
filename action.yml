@@ -1,0 +1,50 @@
+name: 'FTP Interactions'
+description: 'GitHub Action to copy/delete files over FTP (based on https://github.com/cinderblockgames/ftp-action)'
+branding:
+  icon: arrow-up-circle
+  color: white
+inputs:
+  server:
+    description:
+      'Address for the destination server.'
+    required: true
+  port:
+    description:
+      'Port for the destination server.'
+    required: false
+    default: '21'
+  username:
+    description:
+      'Username for the destination server.'
+    required: true
+  password:
+    description:
+      'Password for the destination server.'
+    required: true
+  localDir:
+    description:
+      'Local Directory from which to upload.'
+    required: false
+    default: '/'
+  deleteFileAppOfflineHtm:
+    description:
+      'Delete app_offline.htm from server.'
+    required: false
+    default: 'false'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+  - '--server'
+  - ${{ inputs.server }}
+  - '--port'
+  - ${{ inputs.port }}
+  - '--username'
+  - ${{ inputs.username }}
+  - '--password'
+  - ${{ inputs.password }}
+  - '--source'
+  - ${{ inputs.source }}
+  - '--deleteFileAppOfflineHtm'
+  - ${{ inputs.deleteFileAppOfflineHtm }}
+  
