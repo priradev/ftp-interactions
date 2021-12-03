@@ -25,7 +25,7 @@ namespace PriRa.GitHub.Actions.Ftp
                 Environment.Exit(1);
             }
         }
-
+        
         private static async Task Run(Options options)
         {
             // Get source files info.
@@ -48,11 +48,13 @@ namespace PriRa.GitHub.Actions.Ftp
             }
             // create an FTP client and specify the host, username and password
             // (delete the credentials to use the "anonymous" account)
+            DisplayFtpConnectionInfo(options);
             var credentials = new NetworkCredential(options.Username, options.Password);
             using (var client = new FtpClient(options.Host, options.Port, credentials))
             {
                 if (options.IgnoreCertificateErrors)
                 {
+                    Console.WriteLine("...Ignore certificate erros...");
                     client.ValidateCertificate += Client_ValidateCertificate;
                 }
 
@@ -81,6 +83,27 @@ namespace PriRa.GitHub.Actions.Ftp
             Console.WriteLine("Complete!");
         }
 
+        private static void DisplayFtpConnectionInfo(Options options)
+        {
+            DisplayFirstAndLastCharacter("Host", options.Host);
+            DisplayFirstAndLastCharacter("Username", options.Username);
+            DisplayFirstAndLastCharacter("Password", options.Password);
+        }
+
+        private static void DisplayFirstAndLastCharacter(string key, string value)
+        {
+            value = Scramble(value);
+            Console.WriteLine($"...{key}: {value}");
+        }
+
+        private static string Scramble(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return "";
+            if (value.Length < 3) return "**";
+
+            return $"{value.Substring(0,1)}***{value.Substring(value.Length-1),1}";
+        }
+
         private static async Task DeleteFile(FtpClient client, string filename)
         {
             if (await client.FileExistsAsync(filename))
@@ -96,6 +119,7 @@ namespace PriRa.GitHub.Actions.Ftp
 
         private static void Client_ValidateCertificate(FtpClient control, FtpSslValidationEventArgs e)
         {
+            Console.WriteLine("...accept invalid certificate");
             e.Accept = true;
         }
 
