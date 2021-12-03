@@ -53,12 +53,4 @@ runs:
   - ${{ inputs.username }}
   - '--password'
   - ${{ inputs.password }}
-  - '--localDir'
-  - ${{ inputs.localDir }}
-  - '--copyLocalDir'
-  - ${{ inputs.copyLocalDir }}
-  - '--deleteFileAppOfflineHtm'
-  - ${{ inputs.deleteFileAppOfflineHtm }}
-  - '--ignoreCertificateErrors'
-  - ${{ inputs.ignoreCertificateErrors }}
   
