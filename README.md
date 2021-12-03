@@ -1,15 +1,18 @@
 # FTP Interact
-This .NET-based GitHub Action top copy or delete files
+This .NET-based GitHub Action to copy or delete files
+
+Code is based on https://github.com/cinderblockgames/ftp-action
 
 ## Inputs
-| Parameter                 | Required  | Default                  | Description                                                                               |
-| :---                      | :---      | :---                     | :---                                                                                      |
-| **server**                | **Yes**   |                          | Address for the destination server.                                                       |
-| port                      | No        | **21**                   | Port for the destination server.                                                          |
-| **username**              | **Yes**   |                          | Username for the destination server.                                                      |
-| **password**              | **Yes**   |                          | Password for the destination server.                                                      |
-| localDir                  | No        | **/**                    | Local Directory from which to upload.                                                     |
-| deleteFileAppOfflineHtm   | No        | **false**                | Delete app_offline.htm from server.                                                       |
+| Parameter               | Required | Default   | Description                          |
+| :---------------------- | :------- | :-------- | :----------------------------------- |
+| **host**                | **Yes**  |           | Address for the destination host     |
+| port                    | No       | **21**    | Port for the destination host        |
+| **username**            | **Yes**  |           | Username for the destination host    |
+| **password**            | **Yes**  |           | Password for the destination host    |
+| localDir                | No       |           | Local Directory from which to upload |
+| deleteFileAppOfflineHtm | No       | **false** | Delete app_offline.htm from host     |
+| ignoreCertificateErrors | No       | **false** | Ignore certificate errors            |
 
 ## Example Workflow
 ```
@@ -30,21 +33,19 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-    - name: Get files
-      uses: actions/checkout@v2.3.4
+    - uses: actions/checkout@v2.3.4
       
     - name: FTP Interact
-      uses: cinderblockgames/ftp-action@v1.2.2
+      uses: priradev/ftp-interactions@v0.2.0-beta
       with:
         # required
-        server: ftp.example.com
+        host: ${{ secrets.FTP_SERVER }}
         username: example@example.com
         password: ${{ secrets.FTP_PASSWORD }}
+        # one of the next is required
+        localDir: ./Resources/Offline/
+        deleteFileAppOfflineHtm: true
         # optional
-        port: 22
-        source: src/path
-        destination: target/path
-        skipUnchanged: true
-        skipDirectories: .github|.well-known|configs|private-keys
-        test: true
+        port: 21
+        ignoreCertificateErrors: false
 ```

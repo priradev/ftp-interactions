@@ -14,28 +14,42 @@ namespace PriRa.GitHub.Actions.Ftp
 
         public static async Task Main(string[] args)
         {
-            await Parser.Default.ParseArguments<Options>(args)
-                .WithParsedAsync(Run);
-#if DEBUG
-            // Pause for review.
-            Console.WriteLine();
-            Console.WriteLine("Press <ENTER> to continue...");
-            Console.ReadLine(); 
-#endif
+            try
+            {
+                await Parser.Default.ParseArguments<Options>(args)
+                    .WithParsedAsync(Run);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                Environment.Exit(1);
+            }
         }
         
         private static async Task Run(Options options)
         {
             // Get source files info.
-            Console.WriteLine("...Finding source files...");
-            var source = Directory.GetFiles(options.SourcePath, "*", SearchOption.AllDirectories)
-                                  .Select(src => new Item(src, options.SourcePath));
-            source = Filter(source, options.SkipDirectories);
-
+            IEnumerable<Item> sourceFiles = new List<Item>();
+            if (!string.IsNullOrEmpty(options.LocalDir))
+            {
+                Console.WriteLine("...Finding source files...");
+                var source = Directory.GetFiles(options.LocalDir, "*", SearchOption.AllDirectories)
+                                      .Select(src => new Item(src, options.LocalDir));
+                source = Filter(source, options.SkipDirectories);
+                if (source == null || !source.Any())
+                {
+                    Console.WriteLine("> No files found");
+                    throw new Exception("No files found");
+                }
+                else
+                {
+                    sourceFiles = source;
+                }
+            }
             // create an FTP client and specify the host, username and password
             // (delete the credentials to use the "anonymous" account)
             var credentials = new NetworkCredential(options.Username, options.Password);
-            using (var client = new FtpClient(options.Server, credentials))
+            using (var client = new FtpClient(options.Host, options.Port, credentials))
             {
                 if (options.IgnoreCertificateErrors)
                 {
@@ -44,19 +58,23 @@ namespace PriRa.GitHub.Actions.Ftp
 
                 Console.WriteLine("...Connecting to remote server...");
                 await client.ConnectAsync();
-                
+
                 if (options.DeleteFileAppOfflineHtm)
                 {
                     await DeleteFile(client, "app_offline.htm");
                 }
-                else
+                else if (!string.IsNullOrEmpty(options.LocalDir))
                 {
-                    foreach (var sourceFile in source)
+                    foreach (var sourceFile in sourceFiles)
                     {
                         // upload a file
                         Console.WriteLine($"...upload: {sourceFile.Name}");
                         await client.UploadFileAsync(sourceFile.FullPath, sourceFile.Name);
                     }
+                }
+                else
+                {
+                    Console.WriteLine("Nothing to do...");
                 }
             }
 

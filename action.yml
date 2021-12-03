@@ -4,47 +4,53 @@ branding:
   icon: arrow-up-circle
   color: white
 inputs:
-  server:
+  host:
     description:
-      'Address for the destination server.'
+      'Address for the FTP host.'
     required: true
   port:
     description:
-      'Port for the destination server.'
+      'Port for the FTP host.'
     required: false
     default: '21'
   username:
     description:
-      'Username for the destination server.'
+      'Username for the FTP host.'
     required: true
   password:
     description:
-      'Password for the destination server.'
+      'Password for the FTP host.'
     required: true
   localDir:
     description:
-      'Local Directory from which to upload.'
+      'Local directory from which to upload.'
     required: false
-    default: '/'
   deleteFileAppOfflineHtm:
     description:
-      'Delete app_offline.htm from server.'
+      'Delete app_offline.htm from FTP host.'
+    required: false
+    default: 'false'
+  ignoreCertificateErrors:
+    description:
+      'Ignore certificate errors.'
     required: false
     default: 'false'
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-  - '--server'
-  - ${{ inputs.server }}
+  - '--host'
+  - ${{ inputs.host }}
   - '--port'
   - ${{ inputs.port }}
   - '--username'
   - ${{ inputs.username }}
   - '--password'
   - ${{ inputs.password }}
-  - '--source'
-  - ${{ inputs.source }}
+  - '--localDir'
+  - ${{ inputs.localDir }}
   - '--deleteFileAppOfflineHtm'
   - ${{ inputs.deleteFileAppOfflineHtm }}
+  - '--ignoreCertificateErrors'
+  - ${{ inputs.ignoreCertificateErrors }}
   
