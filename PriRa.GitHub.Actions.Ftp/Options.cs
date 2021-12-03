@@ -49,15 +49,10 @@ namespace PriRa.GitHub.Actions.Ftp
             HelpText = "Local directory from which to upload.")]
         public string LocalDir { get; set; }
 
-        [Option("copyLocalDir",
-            Required = false, Default = false,
-            HelpText = "Copy files from localDir")] 
-        public bool CopyLocalDir { get; set; }
-
-        [Option("deleteFileAppOfflineHtm",
-            Required = false, Default = false,
-            HelpText = "Delete app_offline.htm from FTP host")]
-        public bool DeleteFileAppOfflineHtm { get; set; }
+        [Option("ftpAction",
+            Required = true, Default = "None",
+            HelpText = "FTP Action: None | Copy | DeleteAppOfflineHtm")] 
+        public FtpActionType FtpAction { get; set; }
 
         // Options.
 

@@ -31,30 +31,31 @@ namespace PriRa.GitHub.Actions.Ftp
             }
         }
 
-        private static void DisplayAllEnvVars(string[] args)
-        {
-            Console.WriteLine("GetEnvironmentVariables: ");
-            foreach (DictionaryEntry de in Environment.GetEnvironmentVariables())
-                Console.WriteLine("  {0} = {1}", de.Key, de.Value);
-            Console.WriteLine();
-            
-            Console.WriteLine("Arguments: ");
-            foreach (var arg in args)
-                Console.WriteLine($"  {arg}");
-            Console.WriteLine();
-        }
+        // private static void DisplayAllEnvVars(string[] args)
+        // {
+        //     Console.WriteLine("GetEnvironmentVariables: ");
+        //     foreach (DictionaryEntry de in Environment.GetEnvironmentVariables())
+        //         Console.WriteLine("  {0} = {1}", de.Key, de.Value);
+        //     Console.WriteLine();
+        //     
+        //     Console.WriteLine("Arguments: ");
+        //     foreach (var arg in args)
+        //         Console.WriteLine($"  {arg}");
+        //     Console.WriteLine();
+        // }
 
         private static async Task Run(Options options)
         {
             // Get source files info.
             IEnumerable<Item> sourceFiles = new List<Item>();
-            if (options.CopyLocalDir && !string.IsNullOrEmpty(options.LocalDir))
+            if (options.FtpAction==FtpActionType.Copy && !string.IsNullOrEmpty(options.LocalDir))
             {
                 Console.WriteLine("...Finding source files...");
                 var source = Directory.GetFiles(options.LocalDir, "*", SearchOption.AllDirectories)
-                                      .Select(src => new Item(src, options.LocalDir));
-                source = Filter(source, options.SkipDirectories);
-                if (source == null || !source.Any())
+                                      .Select(src => new Item(src, options.LocalDir))
+                                      .ToList();
+                source = Filter(source, options.SkipDirectories)?.ToList()??new List<Item>();
+                if (!source.Any())
                 {
                     Console.WriteLine("> No files found");
                     throw new Exception("No files found");
@@ -77,11 +78,11 @@ namespace PriRa.GitHub.Actions.Ftp
                 Console.WriteLine("...Connecting to remote server...");
                 await client.ConnectAsync();
 
-                if (options.DeleteFileAppOfflineHtm)
+                if (options.FtpAction == FtpActionType.DeleteAppOfflineHtm)
                 {
                     await DeleteFile(client, "app_offline.htm");
                 }
-                else if (options.CopyLocalDir && !string.IsNullOrEmpty(options.LocalDir))
+                else if (options.FtpAction== FtpActionType.Copy && !string.IsNullOrEmpty(options.LocalDir))
                 {
                     foreach (var sourceFile in sourceFiles)
                     {
