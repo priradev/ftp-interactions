@@ -36,7 +36,7 @@ jobs:
     - uses: actions/checkout@v2.3.4
       
     - name: FTP Interact
-      uses: priradev/ftp-interactions@v0.2.3-beta
+      uses: priradev/ftp-interactions@v0.2.4-beta
       with:
         # required
         host: ${{ secrets.FTP_SERVER }}

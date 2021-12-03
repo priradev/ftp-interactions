@@ -9,8 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="CommandLineParser" Version="2.8.0" />
       <PackageReference Include="FluentFTP" Version="35.2.1" />
+      <PackageReference Include="get-options-mixed" Version="1.0.0" />
     </ItemGroup>
 
 </Project>

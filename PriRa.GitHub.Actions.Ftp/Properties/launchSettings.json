@@ -1,7 +1,8 @@
 {
   "profiles": {
     "PriRa.GitHub.Actions.Ftp": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "--host=ftp.ultratheorie.nl --username=ftp.acc.ultratheorie --password=Ftp!Acc!123 --deleteFileAppOfflineHtm=false"
     }
   }
 }

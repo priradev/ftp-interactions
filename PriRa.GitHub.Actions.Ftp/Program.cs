@@ -16,8 +16,8 @@ namespace PriRa.GitHub.Actions.Ftp
         {
             try
             {
-                await Parser.Default.ParseArguments<Options>(args)
-                    .WithParsedAsync(Run);
+                var options = Options.CheckArguments(args);
+                await Run(options); 
             }
             catch (Exception ex)
             {
@@ -25,7 +25,7 @@ namespace PriRa.GitHub.Actions.Ftp
                 Environment.Exit(1);
             }
         }
-        
+
         private static async Task Run(Options options)
         {
             // Get source files info.
