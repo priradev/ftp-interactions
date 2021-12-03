@@ -15,4 +15,4 @@ LABEL com.github.actions.color="white"
 
 FROM mcr.microsoft.com/dotnet/runtime:5.0
 COPY --from=build-env /out .
-ENTRYPOINT ["dotnet", "PriRa.GitHub.Actions.Ftp.dll"]
+ENTRYPOINT ["dotnet", "/PriRa.GitHub.Actions.Ftp.dll"]
