@@ -30,7 +30,7 @@ namespace PriRa.GitHub.Actions.Ftp
         {
             // Get source files info.
             IEnumerable<Item> sourceFiles = new List<Item>();
-            if (!string.IsNullOrEmpty(options.LocalDir))
+            if (options.CopyLocalDir && !string.IsNullOrEmpty(options.LocalDir))
             {
                 Console.WriteLine("...Finding source files...");
                 var source = Directory.GetFiles(options.LocalDir, "*", SearchOption.AllDirectories)
@@ -41,10 +41,8 @@ namespace PriRa.GitHub.Actions.Ftp
                     Console.WriteLine("> No files found");
                     throw new Exception("No files found");
                 }
-                else
-                {
-                    sourceFiles = source;
-                }
+
+                sourceFiles = source;
             }
             // create an FTP client and specify the host, username and password
             // (delete the credentials to use the "anonymous" account)
@@ -65,7 +63,7 @@ namespace PriRa.GitHub.Actions.Ftp
                 {
                     await DeleteFile(client, "app_offline.htm");
                 }
-                else if (!string.IsNullOrEmpty(options.LocalDir))
+                else if (options.CopyLocalDir && !string.IsNullOrEmpty(options.LocalDir))
                 {
                     foreach (var sourceFile in sourceFiles)
                     {

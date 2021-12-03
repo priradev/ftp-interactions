@@ -48,9 +48,9 @@ namespace PriRa.GitHub.Actions.Ftp
         // Action.
 
         /// <summary>
-        /// Local directory from which to upload
+        /// Copy files from localDir
         /// </summary>
-        public string LocalDir { get; set; }
+        public bool CopyLocalDir { get; set; }
 
         /// <summary>
         /// Delete app_offline.htm from FTP host
@@ -60,13 +60,17 @@ namespace PriRa.GitHub.Actions.Ftp
         // Options.
 
         /// <summary>
+        /// Local directory from which to upload
+        /// </summary>
+        public string LocalDir { get; set; }
+
+        /// <summary>
         /// Folders to be ignored in both source and destination, separated by a pipe (|) character.
         /// Default = ".github|.well-known"
         /// </summary>
-        ///
         public string SkipDirectories { get; set; }
 
-                private static string CMDLINE_ARGUMENTS = @"host=s port=n username=s password=s ignoreCertificateErrors:s localDir=s deleteFileAppOfflineHtm:s skipDirectories=s";
+                private static string CMDLINE_ARGUMENTS = @"host=s port=n username=s password=s ignoreCertificateErrors:s localDir=s copyLocalDir:s deleteFileAppOfflineHtm:s skipDirectories=s";
 
         public static Options CheckArguments(string[] args)
         {
@@ -80,54 +84,67 @@ namespace PriRa.GitHub.Actions.Ftp
                 }
             }
 
-            var result = new Options();
-            var options = new GetOptionsMixed(CMDLINE_ARGUMENTS);
-            options.ParseOptions(ref args);
-            while (options.NextOption())
+            try
             {
-                switch (options.OptionName)
+                var result = new Options();
+                var options = new GetOptionsMixed(CMDLINE_ARGUMENTS);
+                options.ParseOptions(ref args);
+                while (options.NextOption())
                 {
-                    case "host":
-                        result.Host = options.OptionValue;
-                        break;
-                    case "port":
-                        result.Port = int.Parse(options.OptionValue);
-                        break;
-                    case "username":
-                        result.Username = options.OptionValue;
-                        break;
-                    case "password":
-                        result.Password = options.OptionValue;
-                        break;
-                    case "ignoreCertificateErrors":
-                        result.IgnoreCertificateErrors = string.IsNullOrEmpty(options.OptionValue) || bool.Parse(options.OptionValue);
-                        break;
-                    case "localDir":
-                        result.LocalDir = options.OptionValue;
-                        break;
-                    case "deleteFileAppOfflineHtm":
-                        result.DeleteFileAppOfflineHtm = string.IsNullOrEmpty(options.OptionValue) || bool.Parse(options.OptionValue);
-                        break;
-                    case "skipDirectories":
-                        result.SkipDirectories = options.OptionValue;
-                        break;
-                    case "h":
-                        Usage();
-                        Environment.Exit(-1);
-                        break;
+                    switch (options.OptionName)
+                    {
+                        case "host":
+                            result.Host = options.OptionValue;
+                            break;
+                        case "port":
+                            result.Port = int.Parse(options.OptionValue);
+                            break;
+                        case "username":
+                            result.Username = options.OptionValue;
+                            break;
+                        case "password":
+                            result.Password = options.OptionValue;
+                            break;
+                        case "ignoreCertificateErrors":
+                            result.IgnoreCertificateErrors = string.IsNullOrEmpty(options.OptionValue) ||
+                                                             bool.Parse(options.OptionValue);
+                            break;
+                        case "localDir":
+                            result.LocalDir = options.OptionValue;
+                            break;
+                        case "copyLocalDir":
+                            result.CopyLocalDir = string.IsNullOrEmpty(options.OptionValue) ||
+                                                  bool.Parse(options.OptionValue);
+                            break;
+                        case "deleteFileAppOfflineHtm":
+                            result.DeleteFileAppOfflineHtm = string.IsNullOrEmpty(options.OptionValue) ||
+                                                             bool.Parse(options.OptionValue);
+                            break;
+                        case "skipDirectories":
+                            result.SkipDirectories = options.OptionValue;
+                            break;
+                        case "h":
+                            Usage();
+                            Environment.Exit(-1);
+                            break;
 #if DEBUG
-                    case "debug":
-                        if (!System.Diagnostics.Debugger.IsAttached)
-                            System.Diagnostics.Debugger.Launch();
-                        break;
+                        case "debug":
+                            if (!System.Diagnostics.Debugger.IsAttached)
+                                System.Diagnostics.Debugger.Launch();
+                            break;
 #endif
-                    default:
-                        throw new GetOptionsUserException("Option: " + options.OptionName + " not implemented.");
+                        default:
+                            throw new GetOptionsUserException("Option: " + options.OptionName + " not implemented.");
+                    }
                 }
+                return result;
             }
-
-            return result;
-
+            catch
+            {
+                Usage();
+                Console.WriteLine();
+                throw;
+            }
         }
 
         private static void Usage()
@@ -145,6 +162,8 @@ namespace PriRa.GitHub.Actions.Ftp
   --ignoreCertificateErrors    (Default: false) Ignore certificate errors.
 
   --localDir                   (Default: ) Local directory from which to upload.
+
+  --copyLocalDir               (Default: false) Copy files from localDir
 
   --deleteFileAppOfflineHtm    (Default: false) Delete app_offline.htm from FTP host
 

@@ -25,6 +25,12 @@ inputs:
     description:
       'Local directory from which to upload.'
     required: false
+    default: '/'
+  copyLocalDir:
+    description:
+      'Copy files from localDir.'
+    required: false
+    default: 'false'
   deleteFileAppOfflineHtm:
     description:
       'Delete app_offline.htm from FTP host.'
@@ -49,6 +55,8 @@ runs:
   - ${{ inputs.password }}
   - '--localDir'
   - ${{ inputs.localDir }}
+  - '--copyLocalDir'
+  - ${{ inputs.copyLocalDir }}
   - '--deleteFileAppOfflineHtm'
   - ${{ inputs.deleteFileAppOfflineHtm }}
   - '--ignoreCertificateErrors'
