@@ -25,7 +25,7 @@ namespace PriRa.GitHub.Actions.Ftp
                 Environment.Exit(1);
             }
         }
-        
+
         private static async Task Run(Options options)
         {
             // Get source files info.
@@ -81,7 +81,7 @@ namespace PriRa.GitHub.Actions.Ftp
             Console.WriteLine("Complete!");
         }
 
-       private static async Task DeleteFile(FtpClient client, string filename)
+        private static async Task DeleteFile(FtpClient client, string filename)
         {
             if (await client.FileExistsAsync(filename))
             {

@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
+﻿FROM mcr.microsoft.com/dotnet/sdk:5.0 as build-env
 
 COPY . ./
 RUN dotnet publish ./PriRa.GitHub.Actions.Ftp/PriRa.GitHub.Actions.Ftp.csproj -c Release -o out --no-self-contained 
@@ -13,6 +13,6 @@ LABEL com.github.actions.description=".NET-based GitHub Action to interact with 
 LABEL com.github.actions.icon="arrow-up-circle"
 LABEL com.github.actions.color="white" 
 
-FROM mcr.microsoft.com/dotnet/runtime:6.0
+FROM mcr.microsoft.com/dotnet/runtime:5.0
 COPY --from=build-env /out .
 ENTRYPOINT ["dotnet", "PriRa.GitHub.Actions.Ftp.dll"]
