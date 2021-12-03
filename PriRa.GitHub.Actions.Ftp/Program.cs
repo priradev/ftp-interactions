@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Collections;
 using CommandLine;
 using FluentFTP;
 
@@ -16,14 +17,31 @@ namespace PriRa.GitHub.Actions.Ftp
         {
             try
             {
-                var options = Options.CheckArguments(args);
-                await Run(options); 
+                //DisplayAllEnvVars(args);
+                await Parser.Default.ParseArguments<Options>(args)
+                    .WithParsedAsync(Run);
+                //
+                // var options = Options.CheckArguments(args);
+                // await Run(options); 
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
                 Environment.Exit(1);
             }
+        }
+
+        private static void DisplayAllEnvVars(string[] args)
+        {
+            Console.WriteLine("GetEnvironmentVariables: ");
+            foreach (DictionaryEntry de in Environment.GetEnvironmentVariables())
+                Console.WriteLine("  {0} = {1}", de.Key, de.Value);
+            Console.WriteLine();
+            
+            Console.WriteLine("Arguments: ");
+            foreach (var arg in args)
+                Console.WriteLine($"  {arg}");
+            Console.WriteLine();
         }
 
         private static async Task Run(Options options)
