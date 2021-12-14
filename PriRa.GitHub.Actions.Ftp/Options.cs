@@ -51,7 +51,7 @@ namespace PriRa.GitHub.Actions.Ftp
 
         [Option("ftpAction",
             Required = true, Default = "None",
-            HelpText = "FTP Action: None | Copy | DeleteAppOfflineHtm")] 
+            HelpText = "FTP Action: None | Copy | DeleteAppOfflineHtm")]
         public FtpActionType FtpAction { get; set; }
 
         // Options.
@@ -62,5 +62,10 @@ namespace PriRa.GitHub.Actions.Ftp
                 "Folders to be ignored in both source and destination, separated by a pipe (|) character.")]
         public string SkipDirectories { get; set; }
 
+        [Option("workingDirectory",
+            Required = false,
+            Default = "httpdocs",
+            HelpText = "Sets the work directory on the server")]
+        public string WorkingDirectory { get; set; }
     }
 }
