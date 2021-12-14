@@ -4,6 +4,7 @@ namespace PriRa.GitHub.Actions.Ftp
     {
         None,
         Copy,
+        Delete,
         DeleteAppOfflineHtm
     }
 }
