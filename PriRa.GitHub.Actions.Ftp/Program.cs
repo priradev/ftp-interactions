@@ -69,6 +69,10 @@ namespace PriRa.GitHub.Actions.Ftp
             var credentials = new NetworkCredential(options.Username, options.Password);
             using (var client = new FtpClient(options.Host, options.Port, credentials))
             {
+                if (string.IsNullOrWhiteSpace(options.WorkingDirectory) == false) {
+                    client.SetWorkingDirectory(options.WorkingDirectory);
+                }
+
                 if (options.IgnoreCertificateErrors)
                 {
                     Console.WriteLine("...Ignore certificate erros...");
