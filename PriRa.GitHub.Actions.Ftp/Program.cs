@@ -48,13 +48,13 @@ namespace PriRa.GitHub.Actions.Ftp
         {
             // Get source files info.
             IEnumerable<Item> sourceFiles = new List<Item>();
-            if (options.FtpAction==FtpActionType.Copy && !string.IsNullOrEmpty(options.LocalDir))
+            if (!string.IsNullOrWhiteSpace(options.LocalDir))
             {
                 Console.WriteLine("...Finding source files...");
                 var source = Directory.GetFiles(options.LocalDir, "*", SearchOption.AllDirectories)
                                       .Select(src => new Item(src, options.LocalDir))
                                       .ToList();
-                source = Filter(source, options.SkipDirectories)?.ToList()??new List<Item>();
+                source = Filter(source, options.SkipDirectories)?.ToList() ?? new List<Item>();
                 if (!source.Any())
                 {
                     Console.WriteLine("> No files found");
@@ -63,6 +63,7 @@ namespace PriRa.GitHub.Actions.Ftp
 
                 sourceFiles = source;
             }
+
             // create an FTP client and specify the host, username and password
             // (delete the credentials to use the "anonymous" account)
             DisplayFtpConnectionInfo(options);
@@ -78,22 +79,29 @@ namespace PriRa.GitHub.Actions.Ftp
                 Console.WriteLine("...Connecting to remote server...");
                 await client.ConnectAsync();
 
-                if (options.FtpAction == FtpActionType.DeleteAppOfflineHtm)
-                {
-                    await DeleteFile(client, "app_offline.htm");
-                }
-                else if (options.FtpAction== FtpActionType.Copy && !string.IsNullOrEmpty(options.LocalDir))
-                {
-                    foreach (var sourceFile in sourceFiles)
-                    {
-                        // upload a file
-                        Console.WriteLine($"...upload: {sourceFile.Name}");
-                        await client.UploadFileAsync(sourceFile.FullPath, sourceFile.Name);
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Nothing to do...");
+                switch (options.FtpAction)
+                {                    
+                    case FtpActionType.Copy when !string.IsNullOrWhiteSpace(options.LocalDir):
+                        foreach (var sourceFile in sourceFiles)
+                        {
+                            // upload a file
+                            Console.WriteLine($"...upload: {sourceFile.Name}");
+                            await client.UploadFileAsync(sourceFile.FullPath, sourceFile.Name);
+                        }
+                        break;
+                    case FtpActionType.DeleteAppOfflineHtm:
+                        await DeleteFile(client, "app_offline.htm");
+                        break;
+                    case FtpActionType.Delete:
+                        foreach (var sourceFile in sourceFiles)
+                        {
+                            Console.WriteLine($"...deleting: {sourceFile.Name}");
+                            await DeleteFile(client, sourceFile.Name);
+                        }
+                        break;
+                    default:
+                        Console.WriteLine("Nothing to do...");
+                        break;
                 }
             }
 
@@ -118,7 +126,7 @@ namespace PriRa.GitHub.Actions.Ftp
             if (string.IsNullOrWhiteSpace(value)) return "";
             if (value.Length < 3) return "**";
 
-            return $"{value.Substring(0,1)}***{value.Substring(value.Length-1),1}";
+            return $"{value.Substring(0, 1)}***{value.Substring(value.Length - 1),1}";
         }
 
         private static async Task DeleteFile(FtpClient client, string filename)
